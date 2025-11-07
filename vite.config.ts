@@ -9,6 +9,7 @@ export default defineConfig({
 		sveltekit(),
 		SvelteKitPWA({
 			registerType: 'autoUpdate',
+			includeAssets: ['favicon.png', 'favicon-16.png', 'icon-192.png', 'icon-512.png'],
 			manifest: {
 				name: 'Pokemon Battle Companion',
 				short_name: 'PokeComp',
