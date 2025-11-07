@@ -1,11 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { base } from '$app/paths';
 </script>
 
 <footer class="footer">
 	<nav class="nav">
-		<a href="/" class="nav-link" class:active={$page.url.pathname === '/'}>Battle</a>
-		<a href="/chart" class="nav-link" class:active={$page.url.pathname === '/chart'}>Type Chart</a>
+		<a href="{base}/" class="nav-link" class:active={$page.url.pathname === `${base}/`}>Battle</a>
+		<a
+			href="{base}/chart"
+			class="nav-link"
+			class:active={$page.url.pathname === `${base}/chart`}
+		>
+			Type Chart
+		</a>
 	</nav>
 </footer>
 

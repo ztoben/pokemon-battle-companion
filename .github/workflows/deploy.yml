@@ -31,6 +31,8 @@ jobs:
         run: npm ci
 
       - name: Build
+        env:
+          BASE_PATH: /pokemon-battle-companion
         run: npm run build
 
       - name: Upload artifact

@@ -7,17 +7,19 @@
 	let { children } = $props();
 
 	onMount(() => {
-		// Only redirect on fresh app open (not on navigation within the session)
 		const hasNavigated = sessionStorage.getItem('hasNavigated');
 		const currentPath = window.location.pathname;
 		const lastPage = localStorage.getItem('lastPage');
 
-		if (!hasNavigated && currentPath === '/' && lastPage && lastPage !== '/') {
-			// This is a fresh app open, redirect to last page
-			goto(lastPage);
+		if (!hasNavigated && lastPage && lastPage !== '/') {
+			const basePath = import.meta.env.BASE_URL || '';
+			const isHome = currentPath === '/' || currentPath === `${basePath}/`;
+
+			if (isHome) {
+				goto(lastPage);
+			}
 		}
 
-		// Mark that we've navigated at least once in this session
 		sessionStorage.setItem('hasNavigated', 'true');
 	});
 </script>
