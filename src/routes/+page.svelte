@@ -35,9 +35,22 @@
 	);
 
 	let notVeryEffective = $derived(
-		selectedPokemon ? getNotVeryEffectiveTypes(selectedPokemon.types) : []
+		selectedPokemon
+			? (() => {
+					const types = selectedPokemon.types;
+					return getNotVeryEffectiveTypes(types).map((type) => ({
+						type,
+						multiplier: calculateEffectiveness(type, types)
+					}));
+				})()
+			: []
 	);
-	let noEffect = $derived(selectedPokemon ? getNoEffectTypes(selectedPokemon.types) : []);
+
+	let noEffect = $derived(
+		selectedPokemon
+			? getNoEffectTypes(selectedPokemon.types).map((type) => ({ type, multiplier: 0 }))
+			: []
+	);
 
 	onMount(async () => {
 		localStorage.setItem('lastPage', '/');
@@ -115,20 +128,22 @@
 		{/if}
 
 		<!-- Search Section -->
-		<div class="search-container">
-			<Autocomplete
-				bind:value={searchQuery}
-				options={filteredPokemon}
-				placeholder="Search Pokemon..."
-				onselect={handleSelect}
-				oninput={handleInput}
-				{loading}
-			/>
+		{#if !selectedPokemon}
+			<div class="search-container">
+				<Autocomplete
+					bind:value={searchQuery}
+					options={filteredPokemon}
+					placeholder="Search Pokemon..."
+					onselect={handleSelect}
+					oninput={handleInput}
+					{loading}
+				/>
 
-			{#if error}
-				<p class="error-message">{error}</p>
-			{/if}
-		</div>
+				{#if error}
+					<p class="error-message">{error}</p>
+				{/if}
+			</div>
+		{/if}
 
 		<!-- Results Section -->
 		{#if selectedPokemon}
@@ -169,8 +184,8 @@
 				<section class="effectiveness-section resist">
 					<h3>Not Very Effective</h3>
 					<div class="types-grid">
-						{#each notVeryEffective as type (type)}
-							<TypeBadge {type} size="sm" />
+						{#each notVeryEffective as { type, multiplier } (type)}
+							<TypeBadge {type} size="sm" {multiplier} />
 						{/each}
 					</div>
 				</section>
@@ -181,8 +196,8 @@
 				<section class="effectiveness-section immune">
 					<h3>No Effect</h3>
 					<div class="types-grid">
-						{#each noEffect as type (type)}
-							<TypeBadge {type} size="sm" />
+						{#each noEffect as { type, multiplier } (type)}
+							<TypeBadge {type} size="sm" {multiplier} />
 						{/each}
 					</div>
 				</section>

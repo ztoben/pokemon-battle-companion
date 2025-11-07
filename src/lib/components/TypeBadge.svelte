@@ -77,6 +77,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		padding: 2px;
 	}
 
 	.type-badge:active {
@@ -127,5 +128,6 @@
 		border-radius: 3px;
 		text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.5);
 		font-weight: bold;
+		margin-right: 2px;
 	}
 </style>

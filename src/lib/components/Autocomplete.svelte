@@ -91,19 +91,6 @@
 			onblur={() => setTimeout(() => (showDropdown = false), 200)}
 			autocomplete="off"
 		/>
-		{#if value}
-			<button
-				class="clear-btn"
-				onclick={() => {
-					value = '';
-					oninput('');
-					showDropdown = false;
-				}}
-				type="button"
-			>
-				×
-			</button>
-		{/if}
 	</div>
 
 	{#if showDropdown && options.length > 0}
@@ -158,30 +145,6 @@
 		outline: none;
 		box-shadow: 4px 4px 0 var(--color-primary);
 		border-color: var(--color-primary);
-	}
-
-	.clear-btn {
-		position: absolute;
-		right: var(--space-md);
-		top: 50%;
-		transform: translateY(-50%);
-		background: none;
-		border: none;
-		font-size: 2rem;
-		color: var(--color-text-light);
-		cursor: pointer;
-		padding: 0;
-		width: 2rem;
-		height: 2rem;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		transition: color var(--transition-fast);
-		line-height: 1;
-	}
-
-	.clear-btn:hover {
-		color: var(--color-text);
 	}
 
 	.autocomplete-dropdown {

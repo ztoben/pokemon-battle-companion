@@ -8,7 +8,8 @@
 		getOffensiveNoEffect,
 		getSuperEffectiveTypes,
 		getNotVeryEffectiveTypes,
-		getNoEffectTypes
+		getNoEffectTypes,
+		calculateEffectiveness
 	} from '$lib/data/type-chart';
 	import { getTypeColor, getTypeOutlineColor } from '$lib/data/type-colors';
 	import TypeBadge from '$lib/components/TypeBadge.svelte';
@@ -19,17 +20,71 @@
 	let selectedType = $state<PokemonType | null>(null);
 	let viewMode = $state<ViewMode>('defending');
 
-	// Defensive matchups (what's good against this type)
-	let defensiveWeaknesses = $derived(selectedType ? getSuperEffectiveTypes([selectedType]) : []);
-	let defensiveResistances = $derived(selectedType ? getNotVeryEffectiveTypes([selectedType]) : []);
-	let defensiveImmunities = $derived(selectedType ? getNoEffectTypes([selectedType]) : []);
-
-	// Offensive matchups (what this type is good against)
-	let offensiveStrengths = $derived(selectedType ? getOffensiveSuperEffective([selectedType]) : []);
-	let offensiveWeaknesses = $derived(
-		selectedType ? getOffensiveNotVeryEffective([selectedType]) : []
+	let defensiveWeaknesses = $derived(
+		selectedType
+			? (() => {
+					const selected = selectedType;
+					return getSuperEffectiveTypes([selected]).map((type) => ({
+						type,
+						multiplier: calculateEffectiveness(type, [selected])
+					}));
+				})()
+			: []
 	);
-	let offensiveImmunities = $derived(selectedType ? getOffensiveNoEffect([selectedType]) : []);
+
+	let defensiveResistances = $derived(
+		selectedType
+			? (() => {
+					const selected = selectedType;
+					return getNotVeryEffectiveTypes([selected]).map((type) => ({
+						type,
+						multiplier: calculateEffectiveness(type, [selected])
+					}));
+				})()
+			: []
+	);
+
+	let defensiveImmunities = $derived(
+		selectedType
+			? getNoEffectTypes([selectedType]).map((type) => ({
+					type,
+					multiplier: 0
+				}))
+			: []
+	);
+
+	let offensiveStrengths = $derived(
+		selectedType
+			? (() => {
+					const selected = selectedType;
+					return getOffensiveSuperEffective([selected]).map((type) => ({
+						type,
+						multiplier: calculateEffectiveness(selected, [type])
+					}));
+				})()
+			: []
+	);
+
+	let offensiveWeaknesses = $derived(
+		selectedType
+			? (() => {
+					const selected = selectedType;
+					return getOffensiveNotVeryEffective([selected]).map((type) => ({
+						type,
+						multiplier: calculateEffectiveness(selected, [type])
+					}));
+				})()
+			: []
+	);
+
+	let offensiveImmunities = $derived(
+		selectedType
+			? getOffensiveNoEffect([selectedType]).map((type) => ({
+					type,
+					multiplier: 0
+				}))
+			: []
+	);
 
 	onMount(() => {
 		localStorage.setItem('lastPage', '/chart');
@@ -113,12 +168,10 @@
 				<!-- Defensive Section -->
 				{#if defensiveWeaknesses.length > 0}
 					<section class="matchup-section super">
-						<h3>
-							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Weak To (2x)
-						</h3>
+						<h3>Super Effective Against {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}</h3>
 						<div class="types-grid">
-							{#each defensiveWeaknesses as type (type)}
-								<TypeBadge {type} size="md" />
+							{#each defensiveWeaknesses as { type, multiplier } (type)}
+								<TypeBadge {type} size="md" {multiplier} />
 							{/each}
 						</div>
 					</section>
@@ -126,12 +179,10 @@
 
 				{#if defensiveResistances.length > 0}
 					<section class="matchup-section resist">
-						<h3>
-							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Resists (½x)
-						</h3>
+						<h3>Not Very Effective Against {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}</h3>
 						<div class="types-grid">
-							{#each defensiveResistances as type (type)}
-								<TypeBadge {type} size="sm" />
+							{#each defensiveResistances as { type, multiplier } (type)}
+								<TypeBadge {type} size="sm" {multiplier} />
 							{/each}
 						</div>
 					</section>
@@ -139,12 +190,10 @@
 
 				{#if defensiveImmunities.length > 0}
 					<section class="matchup-section immune">
-						<h3>
-							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Immune To (0x)
-						</h3>
+						<h3>No Effect Against {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}</h3>
 						<div class="types-grid">
-							{#each defensiveImmunities as type (type)}
-								<TypeBadge {type} size="sm" />
+							{#each defensiveImmunities as { type, multiplier } (type)}
+								<TypeBadge {type} size="sm" {multiplier} />
 							{/each}
 						</div>
 					</section>
@@ -153,12 +202,10 @@
 				<!-- Offensive Section -->
 				{#if offensiveStrengths.length > 0}
 					<section class="matchup-section super">
-						<h3>
-							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Strong Against (2x)
-						</h3>
+						<h3>{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Super Effective</h3>
 						<div class="types-grid">
-							{#each offensiveStrengths as type (type)}
-								<TypeBadge {type} size="md" />
+							{#each offensiveStrengths as { type, multiplier } (type)}
+								<TypeBadge {type} size="md" {multiplier} />
 							{/each}
 						</div>
 					</section>
@@ -166,12 +213,10 @@
 
 				{#if offensiveWeaknesses.length > 0}
 					<section class="matchup-section resist">
-						<h3>
-							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Weak Against (½x)
-						</h3>
+						<h3>{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Not Very Effective</h3>
 						<div class="types-grid">
-							{#each offensiveWeaknesses as type (type)}
-								<TypeBadge {type} size="sm" />
+							{#each offensiveWeaknesses as { type, multiplier } (type)}
+								<TypeBadge {type} size="sm" {multiplier} />
 							{/each}
 						</div>
 					</section>
@@ -179,12 +224,10 @@
 
 				{#if offensiveImmunities.length > 0}
 					<section class="matchup-section immune">
-						<h3>
-							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Has No Effect (0x)
-						</h3>
+						<h3>{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} No Effect</h3>
 						<div class="types-grid">
-							{#each offensiveImmunities as type (type)}
-								<TypeBadge {type} size="sm" />
+							{#each offensiveImmunities as { type, multiplier } (type)}
+								<TypeBadge {type} size="sm" {multiplier} />
 							{/each}
 						</div>
 					</section>
@@ -282,9 +325,9 @@
 
 	.tab-button {
 		font-family: var(--font-heading);
-		font-size: 0.625rem;
+		font-size: 0.75rem;
 		text-transform: uppercase;
-		padding: var(--space-sm) var(--space-lg);
+		padding: var(--space-md) var(--space-lg);
 		border: 3px solid var(--color-text);
 		border-radius: var(--radius-sm);
 		background-color: var(--color-surface);
@@ -304,15 +347,6 @@
 	.tab-button.active {
 		background-color: var(--color-primary);
 		color: white;
-		box-shadow:
-			inset 0 0 0 2px var(--color-primary-dark),
-			3px 3px 0 var(--color-text);
-	}
-
-	.tab-button.active:active {
-		box-shadow:
-			inset 0 0 0 2px var(--color-primary-dark),
-			1px 1px 0 var(--color-text);
 	}
 
 	.matchup-section {
