@@ -20,6 +20,8 @@
 	let allPokemon = $state<Array<{ id: number; name: string }>>([]);
 	let filteredPokemon = $state<Array<{ id: number; name: string }>>([]);
 
+	let autocompleteRef: { focus: () => void };
+
 	let superEffectiveWithMultipliers = $derived(
 		selectedPokemon
 			? (() => {
@@ -57,6 +59,9 @@
 
 		await pokeapi.init();
 		allPokemon = await pokeapi.getAllPokemonNames();
+
+		// Auto-focus the search bar
+		setTimeout(() => autocompleteRef?.focus(), 100);
 	});
 
 	async function handleSelect(option: { id: number; name: string }) {
@@ -106,6 +111,9 @@
 		selectedPokemon = null;
 		error = null;
 		filteredPokemon = [];
+
+		// Focus the search bar after clearing
+		setTimeout(() => autocompleteRef?.focus(), 100);
 	}
 </script>
 
@@ -128,22 +136,21 @@
 		{/if}
 
 		<!-- Search Section -->
-		{#if !selectedPokemon}
-			<div class="search-container">
-				<Autocomplete
-					bind:value={searchQuery}
-					options={filteredPokemon}
-					placeholder="Search Pokemon..."
-					onselect={handleSelect}
-					oninput={handleInput}
-					{loading}
-				/>
+		<div class="search-container">
+			<Autocomplete
+				bind:this={autocompleteRef}
+				bind:value={searchQuery}
+				options={filteredPokemon}
+				placeholder="Search Pokemon..."
+				onselect={handleSelect}
+				oninput={handleInput}
+				{loading}
+			/>
 
-				{#if error}
-					<p class="error-message">{error}</p>
-				{/if}
-			</div>
-		{/if}
+			{#if error}
+				<p class="error-message">{error}</p>
+			{/if}
+		</div>
 
 		<!-- Results Section -->
 		{#if selectedPokemon}

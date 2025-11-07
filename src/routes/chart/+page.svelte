@@ -168,7 +168,9 @@
 				<!-- Defensive Section -->
 				{#if defensiveWeaknesses.length > 0}
 					<section class="matchup-section super">
-						<h3>Super Effective Against {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}</h3>
+						<h3>
+							Super Effective Against {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}
+						</h3>
 						<div class="types-grid">
 							{#each defensiveWeaknesses as { type, multiplier } (type)}
 								<TypeBadge {type} size="md" {multiplier} />
@@ -179,7 +181,10 @@
 
 				{#if defensiveResistances.length > 0}
 					<section class="matchup-section resist">
-						<h3>Not Very Effective Against {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}</h3>
+						<h3>
+							Not Very Effective Against {selectedType.charAt(0).toUpperCase() +
+								selectedType.slice(1)}
+						</h3>
 						<div class="types-grid">
 							{#each defensiveResistances as { type, multiplier } (type)}
 								<TypeBadge {type} size="sm" {multiplier} />
@@ -190,7 +195,9 @@
 
 				{#if defensiveImmunities.length > 0}
 					<section class="matchup-section immune">
-						<h3>No Effect Against {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}</h3>
+						<h3>
+							No Effect Against {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}
+						</h3>
 						<div class="types-grid">
 							{#each defensiveImmunities as { type, multiplier } (type)}
 								<TypeBadge {type} size="sm" {multiplier} />
@@ -213,7 +220,9 @@
 
 				{#if offensiveWeaknesses.length > 0}
 					<section class="matchup-section resist">
-						<h3>{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Not Very Effective</h3>
+						<h3>
+							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Not Very Effective
+						</h3>
 						<div class="types-grid">
 							{#each offensiveWeaknesses as { type, multiplier } (type)}
 								<TypeBadge {type} size="sm" {multiplier} />

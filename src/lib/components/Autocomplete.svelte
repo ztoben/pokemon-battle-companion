@@ -24,6 +24,11 @@
 
 	let showDropdown = $state(false);
 	let highlightedIndex = $state(0);
+	let inputElement: HTMLInputElement;
+
+	export function focus() {
+		inputElement?.focus();
+	}
 
 	function handleInput(e: Event) {
 		const target = e.target as HTMLInputElement;
@@ -81,6 +86,7 @@
 <div class="autocomplete">
 	<div class="input-wrapper">
 		<input
+			bind:this={inputElement}
 			type="text"
 			{value}
 			{placeholder}

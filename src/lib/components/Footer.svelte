@@ -6,11 +6,7 @@
 <footer class="footer">
 	<nav class="nav">
 		<a href="{base}/" class="nav-link" class:active={$page.url.pathname === `${base}/`}>Battle</a>
-		<a
-			href="{base}/chart"
-			class="nav-link"
-			class:active={$page.url.pathname === `${base}/chart`}
-		>
+		<a href="{base}/chart" class="nav-link" class:active={$page.url.pathname === `${base}/chart`}>
 			Type Chart
 		</a>
 	</nav>
