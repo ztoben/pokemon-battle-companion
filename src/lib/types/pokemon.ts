@@ -12,6 +12,7 @@ export interface Pokemon {
 	weight: number;
 	stats: PokemonStats;
 	species_url: string;
+	evolutionChain?: EvolutionChain;
 }
 
 export interface PokemonStats {
@@ -58,19 +59,58 @@ export interface PokeAPIResponse {
 }
 
 /**
- * Evolution chain data
+ * Evolution chain data - flattened for display
  */
-export interface EvolutionChain {
-	species: string;
-	evolvesTo: EvolutionChain[];
-	evolutionDetails: EvolutionDetail | null;
+export interface EvolutionChainMember {
+	id: number;
+	name: string;
+	sprite: string;
+	evolutionTrigger?: string;
 }
 
-export interface EvolutionDetail {
-	minLevel?: number;
-	trigger: string;
-	item?: string;
-	condition?: string;
+export interface EvolutionChain {
+	chain: EvolutionChainMember[];
+}
+
+/**
+ * Raw PokeAPI Evolution Chain response
+ */
+export interface PokeAPIEvolutionChain {
+	id: number;
+	chain: PokeAPIChainLink;
+}
+
+export interface PokeAPIChainLink {
+	is_baby: boolean;
+	species: {
+		name: string;
+		url: string;
+	};
+	evolution_details: Array<{
+		min_level?: number;
+		trigger: {
+			name: string;
+		};
+		item?: {
+			name: string;
+		};
+		min_happiness?: number;
+		min_beauty?: number;
+		time_of_day?: string;
+		location?: {
+			name: string;
+		};
+		held_item?: {
+			name: string;
+		};
+		known_move?: {
+			name: string;
+		};
+		trade_species?: {
+			name: string;
+		};
+	}>;
+	evolves_to: PokeAPIChainLink[];
 }
 
 /**

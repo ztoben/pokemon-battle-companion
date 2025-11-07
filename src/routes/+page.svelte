@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import TypeBadge from '$lib/components/TypeBadge.svelte';
 	import Autocomplete from '$lib/components/Autocomplete.svelte';
+	import EvolutionChain from '$lib/components/EvolutionChain.svelte';
 	import Footer from '$lib/components/Footer.svelte';
 	import {
 		getSuperEffectiveTypes,
@@ -9,11 +10,12 @@
 		getNoEffectTypes,
 		calculateEffectiveness
 	} from '$lib/data/type-chart';
-	import type { Pokemon } from '$lib/types/pokemon';
+	import type { Pokemon, EvolutionChain as EvolutionChainType } from '$lib/types/pokemon';
 	import { pokeapi } from '$lib/services/pokeapi';
 
 	let searchQuery = $state('');
 	let selectedPokemon = $state<Pokemon | null>(null);
+	let evolutionChain = $state<EvolutionChainType | null>(null);
 	let loading = $state(false);
 	let error = $state<string | null>(null);
 
@@ -68,12 +70,18 @@
 		loading = true;
 		error = null;
 		selectedPokemon = null;
+		evolutionChain = null;
 
 		try {
 			const pokemon = await pokeapi.getPokemon(option.id);
 
 			if (pokemon) {
 				selectedPokemon = pokemon;
+
+				// Fetch evolution chain in the background
+				pokeapi.getEvolutionChain(option.id).then((chain) => {
+					evolutionChain = chain;
+				});
 			} else {
 				error = 'Pokemon not found';
 			}
@@ -109,6 +117,7 @@
 	function clearSearch() {
 		searchQuery = '';
 		selectedPokemon = null;
+		evolutionChain = null;
 		error = null;
 		filteredPokemon = [];
 
@@ -173,6 +182,11 @@
 					{/each}
 				</div>
 			</section>
+
+			<!-- Evolution Chain -->
+			{#if evolutionChain}
+				<EvolutionChain chain={evolutionChain.chain} currentPokemonId={selectedPokemon.id} />
+			{/if}
 
 			<!-- Super Effective Section -->
 			{#if superEffectiveWithMultipliers.length > 0}

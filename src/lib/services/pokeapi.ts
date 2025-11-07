@@ -4,7 +4,11 @@ import type {
 	PokeAPIResponse,
 	PokemonListItem,
 	PokemonSpecies,
-	CachedPokemon
+	CachedPokemon,
+	EvolutionChain,
+	EvolutionChainMember,
+	PokeAPIEvolutionChain,
+	PokeAPIChainLink
 } from '$lib/types/pokemon';
 import { indexedDB } from './indexeddb';
 
@@ -143,6 +147,123 @@ class PokeAPIService {
 			return data;
 		} catch (error) {
 			console.error(`Error fetching species ${idOrName}:`, error);
+			return null;
+		}
+	}
+
+	/**
+	 * Format evolution trigger text for display
+	 */
+	private formatEvolutionTrigger(details: PokeAPIChainLink['evolution_details'][0]): string {
+		if (!details) return '';
+
+		const parts: string[] = [];
+
+		// Level up
+		if (details.min_level) {
+			parts.push(`Level ${details.min_level}`);
+		}
+
+		// Item
+		if (details.item) {
+			parts.push(`Use ${details.item.name.replace(/-/g, ' ')}`);
+		}
+
+		// Trade
+		if (details.trigger.name === 'trade') {
+			if (details.held_item) {
+				parts.push(`Trade holding ${details.held_item.name.replace(/-/g, ' ')}`);
+			} else if (details.trade_species) {
+				parts.push(`Trade for ${details.trade_species.name.replace(/-/g, ' ')}`);
+			} else {
+				parts.push('Trade');
+			}
+		}
+
+		// Happiness
+		if (details.min_happiness) {
+			parts.push(`Happiness ${details.min_happiness}+`);
+		}
+
+		// Time of day
+		if (details.time_of_day) {
+			parts.push(details.time_of_day);
+		}
+
+		// Location
+		if (details.location) {
+			parts.push(`at ${details.location.name.replace(/-/g, ' ')}`);
+		}
+
+		// Known move
+		if (details.known_move) {
+			parts.push(`knowing ${details.known_move.name.replace(/-/g, ' ')}`);
+		}
+
+		return parts.length > 0 ? parts.join(', ') : 'Level up';
+	}
+
+	/**
+	 * Flatten evolution chain into a linear array (handles only linear chains, not branches)
+	 */
+	private async flattenEvolutionChain(
+		chainLink: PokeAPIChainLink,
+		result: EvolutionChainMember[] = []
+	): Promise<EvolutionChainMember[]> {
+		// Extract species ID from URL
+		const speciesId = parseInt(chainLink.species.url.split('/').slice(-2, -1)[0]);
+
+		// Fetch Pokemon data to get sprite
+		const pokemon = await this.getPokemon(speciesId);
+
+		if (pokemon) {
+			const evolutionTrigger =
+				chainLink.evolution_details.length > 0
+					? this.formatEvolutionTrigger(chainLink.evolution_details[0])
+					: undefined;
+
+			result.push({
+				id: pokemon.id,
+				name: pokemon.name,
+				sprite: pokemon.sprite,
+				evolutionTrigger
+			});
+		}
+
+		// Recursively process evolutions (take first branch only for simplicity)
+		if (chainLink.evolves_to.length > 0) {
+			await this.flattenEvolutionChain(chainLink.evolves_to[0], result);
+		}
+
+		return result;
+	}
+
+	/**
+	 * Get evolution chain for a Pokemon
+	 */
+	async getEvolutionChain(idOrName: string | number): Promise<EvolutionChain | null> {
+		await this.init();
+
+		try {
+			// First get species data to get evolution chain URL
+			const species = await this.getSpecies(idOrName);
+			if (!species) return null;
+
+			// Extract evolution chain ID from URL
+			const chainId = parseInt(species.evolution_chain.url.split('/').slice(-2, -1)[0]);
+
+			// Fetch evolution chain
+			const response = await fetch(`${BASE_URL}/evolution-chain/${chainId}`);
+			if (!response.ok) return null;
+
+			const data: PokeAPIEvolutionChain = await response.json();
+
+			// Flatten the chain
+			const chain = await this.flattenEvolutionChain(data.chain);
+
+			return { chain };
+		} catch (error) {
+			console.error(`Error fetching evolution chain for ${idOrName}:`, error);
 			return null;
 		}
 	}
