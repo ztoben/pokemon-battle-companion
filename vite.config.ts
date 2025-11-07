@@ -2,6 +2,8 @@ import { sveltekit } from '@sveltejs/kit/vite';
 import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 import { defineConfig } from 'vite';
 
+const base = process.env.BASE_PATH || '';
+
 export default defineConfig({
 	plugins: [
 		sveltekit(),
@@ -14,17 +16,17 @@ export default defineConfig({
 				theme_color: '#DC0A2D',
 				background_color: '#FFFBF7',
 				display: 'standalone',
-				start_url: '/',
-				scope: '/',
+				start_url: base || '/',
+				scope: base || '/',
 				icons: [
 					{
-						src: '/icon-192.png',
+						src: `${base}/icon-192.png`,
 						sizes: '192x192',
 						type: 'image/png',
 						purpose: 'any maskable'
 					},
 					{
-						src: '/icon-512.png',
+						src: `${base}/icon-512.png`,
 						sizes: '512x512',
 						type: 'image/png',
 						purpose: 'any maskable'
@@ -41,7 +43,7 @@ export default defineConfig({
 							cacheName: 'pokeapi-cache',
 							expiration: {
 								maxEntries: 500,
-								maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+								maxAgeSeconds: 60 * 60 * 24 * 30
 							},
 							cacheableResponse: {
 								statuses: [0, 200]
@@ -50,9 +52,13 @@ export default defineConfig({
 					}
 				]
 			},
+			injectManifest: {
+				globPatterns: ['**/*.{js,css,html,ico,png,svg,webp,webmanifest}']
+			},
 			devOptions: {
 				enabled: true,
-				type: 'module'
+				type: 'module',
+				navigateFallback: '/'
 			}
 		})
 	]

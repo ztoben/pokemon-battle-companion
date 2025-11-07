@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
+	import InstallPrompt from '$lib/components/InstallPrompt.svelte';
 	import '../app.css';
 	import favicon from '$lib/assets/favicon.png';
 
@@ -28,4 +29,5 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
+<InstallPrompt />
 {@render children()}
