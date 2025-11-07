@@ -113,7 +113,9 @@
 				<!-- Defensive Section -->
 				{#if defensiveWeaknesses.length > 0}
 					<section class="matchup-section super">
-						<h3>Weak To (2x)</h3>
+						<h3>
+							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Weak To (2x)
+						</h3>
 						<div class="types-grid">
 							{#each defensiveWeaknesses as type (type)}
 								<TypeBadge {type} size="md" />
@@ -124,7 +126,9 @@
 
 				{#if defensiveResistances.length > 0}
 					<section class="matchup-section resist">
-						<h3>Resists (½x)</h3>
+						<h3>
+							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Resists (½x)
+						</h3>
 						<div class="types-grid">
 							{#each defensiveResistances as type (type)}
 								<TypeBadge {type} size="sm" />
@@ -135,7 +139,9 @@
 
 				{#if defensiveImmunities.length > 0}
 					<section class="matchup-section immune">
-						<h3>Immune To (0x)</h3>
+						<h3>
+							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Immune To (0x)
+						</h3>
 						<div class="types-grid">
 							{#each defensiveImmunities as type (type)}
 								<TypeBadge {type} size="sm" />
@@ -147,7 +153,9 @@
 				<!-- Offensive Section -->
 				{#if offensiveStrengths.length > 0}
 					<section class="matchup-section super">
-						<h3>Strong Against (2x)</h3>
+						<h3>
+							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Strong Against (2x)
+						</h3>
 						<div class="types-grid">
 							{#each offensiveStrengths as type (type)}
 								<TypeBadge {type} size="md" />
@@ -158,7 +166,9 @@
 
 				{#if offensiveWeaknesses.length > 0}
 					<section class="matchup-section resist">
-						<h3>Weak Against (½x)</h3>
+						<h3>
+							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Weak Against (½x)
+						</h3>
 						<div class="types-grid">
 							{#each offensiveWeaknesses as type (type)}
 								<TypeBadge {type} size="sm" />
@@ -169,7 +179,9 @@
 
 				{#if offensiveImmunities.length > 0}
 					<section class="matchup-section immune">
-						<h3>Can't Hit (0x)</h3>
+						<h3>
+							{selectedType.charAt(0).toUpperCase() + selectedType.slice(1)} Has No Effect (0x)
+						</h3>
 						<div class="types-grid">
 							{#each offensiveImmunities as type (type)}
 								<TypeBadge {type} size="sm" />

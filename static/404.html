@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<script>
+			// Redirect to index.html with the path as a query parameter
+			const pathSegmentsToKeep = 1;
+			const path = window.location.pathname
+				.split('/')
+				.slice(0, 1 + pathSegmentsToKeep)
+				.join('/');
+			const route = window.location.pathname.slice(path.length);
+			window.history.replaceState(null, null, path + '/?redirect=' + encodeURIComponent(route));
+			window.location.replace(path + '/');
+		</script>
+	</head>
+	<body></body>
+</html>

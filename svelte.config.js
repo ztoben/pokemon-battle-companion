@@ -9,7 +9,8 @@ const config = {
 
 	kit: {
 		adapter: adapter({
-			fallback: 'index.html'
+			fallback: '404.html',
+			strict: false
 		}),
 		paths: {
 			base: dev ? '' : process.env.BASE_PATH
